@@ -57,17 +57,20 @@ Bytes 8-11:  0x00 00 90 DC Frame seq number, a 32b unsigned int that wraps.
 Bytes 12-15: 0xC6 EA 27 00 Timestamp of Tx of this frame from tester, from the
 tester's internal clock.
 
-The unit is the period of a byte in old STM-1 aggregates:
-8x1000/155.52 ns = 51.44 ns
+The unit is the Tx period of a single byte in old STM-1 aggregates:
+(1 second / 155,520,000 bps) * 8 == one byte every 51.44ns
 
-The diff between two consecutive timestamps is the delay between each frame Tx.
-Example of these 4-byte timestamp values from 4 consecutive frames:
+The diff between two consecutive timestamps, is the delay in transmission
+between each frame, measure in the number of STM-1 byte intervals.
+
+Example 4-byte timestamp values, from 4 consecutive frames:
 0xD7 93 A2 0E == 3616776718
-0xD7 94 4E 96 == 3616820886 (+44168)
-0xD7 94 FB 1D == 3616865053 (+44167)
-0xD7 95 A7 A5 == 3616909221 (+44168)
+0xD7 94 4E 96 == 3616820886 (diff +44168)
+0xD7 94 FB 1D == 3616865053 (diff +44167)
+0xD7 95 A7 A5 == 3616909221 (diff +44168)
 
-A diff of 44168 means: (44168 x 51.44 ns)/1000/1000 = 2.272 ms
+A diff of 44168 means: (44168 x 51.44 ns)/1000/1000 = 2.272 ms.
+
 When looking at the PCAP in Wireshark this matched the field:
 "Time delta from previous captured frame: 0.002272620 seconds"
 
