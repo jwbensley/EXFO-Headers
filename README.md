@@ -5,28 +5,6 @@ The purpose of this repo is to document the reverse engineering efforts of the c
 This repo includes a PCAP of an EXFO test traffic flow inside an MPLS L2 VPN and a script I hacked together to check for out of sequence EXFO test frames inside the L2 VPN,  by checking the sequence number field inside the custom EXFO headers. The script is very rough, it's nothing more than a rudimentary example. Don't raise issues to fix the script, I don't care.
 
 
-### Prerequisites
-
-```bash
-$sudo apt-get install tshark
-```
-
-### Example Output
-
-```bash
-$./packet_order.py EXFO\ in\ L2VPN.pcapng
-100 packets decoded from EXFO in L2VPN.pcapng
-
-
-Non-EXFO packets found: 0
-EXFO packets found: 100
-Total SEQ OOO: 0
-Total lost packets: 0
-Mean timestamp diff 2.43ms
-Mode timestamp diff 2.43ms
-Median timestamp diff 2.43ms
-```
-
 ### EXFO Packet Header
 
 Below are the reverse engineering efforts for the EXFO headers:
@@ -87,4 +65,57 @@ of this EXFOs MAC address. Over many tests they are always 0D FF, so not sure
 if they are meant to by last 2 bytes of MAC or if that is just a coincidence.
 
 Everything after the 2-byte trailer is random per-frame garbage.
+```
+
+### Prerequisites
+
+```bash
+$sudo apt-get install tshark
+```
+
+### Example Good Output
+
+```bash
+$./packet_order.py EXFO\ in\ L2VPN.pcapng
+100 packets decoded from EXFO in L2VPN.pcapng
+
+
+Non-EXFO packets found: 0
+EXFO packets found: 100
+Total SEQ OOO: 0
+Total lost packets: 0
+Mean timestamp diff 2.43ms
+Mode timestamp diff 2.43ms
+Median timestamp diff 2.43ms
+```
+
+### Example Bad Output
+
+The "good" PCAP which contains 100 EXFO packets, all in order, has been modified to demonstrate network packet loss and re-ordering. Packet 11 has been dropped, and packets 21 and 22 are reversed.
+
+```bash
+$./packet_order.py EXFO\ in\ L2VPN\ -\ bad.pcapng
+99 packets decoded from EXFO in L2VPN - bad.pcapng
+Out of sequence packet found: seq diff is 0x2 2
+Pkt 9: seq 0x000b033f 721727 0.11.3.63
+Pkt 10: seq 0x000b0341 721729 0.11.3.65
+Seq num is 1 packet(s) early/late
+Found 0 inbetween seq nums
+Couldn't find 1 sequence number(s) in pcap, assume lost?
+
+Out of sequence packet found: seq diff is 0x2 2
+Pkt 18: seq 0x000b0349 721737 0.11.3.73
+Pkt 19: seq 0x000b034b 721739 0.11.3.75
+Seq num is 1 packet(s) early/late
+Found all 1 inbetween seq nums in pcap, none are missing
+
+
+
+Non-EXFO packets found: 0
+EXFO packets found: 99
+Total SEQ OOO: 2
+Total lost packets: 1
+Mean timestamp diff 2.46ms
+Mode timestamp diff 2.43ms
+Median timestamp diff 2.43ms
 ```
