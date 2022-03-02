@@ -58,10 +58,10 @@ Bytes 12-15: 0xC6 EA 27 00 Timestamp of Tx of this frame from tester, from the
 tester's internal clock.
 
 The unit is the Tx period of a single byte in old STM-1 aggregates:
-(1 second / 155,520,000 bps) * 8 == one byte every 51.44ns
+(1 second / 155,520,000 bps) * 8 == one byte every 51.44 ns
 
 The diff between two consecutive timestamps, is the delay in transmission
-between each frame, measure in the number of STM-1 byte intervals.
+between each frame, measured by the number of STM-1 byte intervals.
 
 Example 4-byte timestamp values, from 4 consecutive frames:
 0xD7 93 A2 0E == 3616776718
@@ -78,7 +78,7 @@ Based on the time delta we can calculate the pps rate and throughput, because
 we know the frame size (from the PCAP):
 EXFO was sending 1500 byte frames.
 Pps == 1/0.00227262 = 440.020768980296 pps
-Data rate == (440.0207 * 1500)*8/1000/1000 == 5.2802484Mbps.
+Data rate == (440.0207 * 1500)*8/1000/1000 == 5.2802484 Mbps.
 Which is roughly correct, the EXFO was set to 5Mbps @ 1500 bytes for this test.
 
 Bytes 16-17: 0x0D FF Trailer of EXFO header.
